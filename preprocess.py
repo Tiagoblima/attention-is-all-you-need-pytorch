@@ -22,10 +22,9 @@ __author__ = "Yu-Hsiang Huang"
 
 
 _TRAIN_DATA_SOURCES = [
-    {"url": "http://data.statmt.org/wmt17/translation-task/" \
-             "training-parallel-nc-v12.tgz",
-     "trg": "news-commentary-v12.de-en.en",
-     "src": "news-commentary-v12.de-en.de"},
+    {"url": "https://github.com/Tiagoblima/ts-corpus-mt/raw/main/train_sm.tgz",
+     "trg": "train.spt",
+     "src": "train.pt"},
     #{"url": "http://www.statmt.org/wmt13/training-parallel-commoncrawl.tgz",
     # "trg": "commoncrawl.de-en.en",
     # "src": "commoncrawl.de-en.de"},
@@ -35,15 +34,14 @@ _TRAIN_DATA_SOURCES = [
     ]
 
 _VAL_DATA_SOURCES = [
-    {"url": "http://data.statmt.org/wmt17/translation-task/dev.tgz",
-     "trg": "newstest2013.en",
-     "src": "newstest2013.de"}]
+    {"url": "https://github.com/Tiagoblima/ts-corpus-mt/raw/main/val_sm.tgz",
+     "trg": "val.spt",
+     "src": "val.pt"}]
 
 _TEST_DATA_SOURCES = [
-    {"url": "https://storage.googleapis.com/tf-perf-public/" \
-                "official_transformer/test_data/newstest2014.tgz",
-     "trg": "newstest2014.en",
-     "src": "newstest2014.de"}]
+    {"url": "https://github.com/Tiagoblima/ts-corpus-mt/raw/main/test_sm.tgz",
+     "trg": "test.spt",
+     "src": "test.pt"}]
 
 
 class TqdmUpTo(tqdm):
@@ -246,7 +244,7 @@ def main_wo_bpe():
     Usage: python preprocess.py -lang_src de -lang_trg en -save_data multi30k_de_en.pkl -share_vocab
     '''
 
-    spacy_support_langs = ['de', 'el', 'en', 'es', 'fr', 'it', 'lt', 'nb', 'nl', 'pt']
+    spacy_support_langs = ['spt','pt']
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-lang_src', required=True, choices=spacy_support_langs)
@@ -267,8 +265,8 @@ def main_wo_bpe():
     assert not any([opt.data_src, opt.data_trg]) or all([opt.data_src, opt.data_trg])
     print(opt)
 
-    src_lang_model = spacy.load(opt.lang_src)
-    trg_lang_model = spacy.load(opt.lang_trg)
+    src_lang_model = spacy.load('pt')
+    trg_lang_model = spacy.load('pt')
 
     def tokenize_src(text):
         return [tok.text for tok in src_lang_model.tokenizer(text)]
@@ -288,7 +286,7 @@ def main_wo_bpe():
     MIN_FREQ = opt.min_word_count
 
     if not all([opt.data_src, opt.data_trg]):
-        assert {opt.lang_src, opt.lang_trg} == {'de', 'en'}
+        assert {opt.lang_src, opt.lang_trg} == {'pt', 'spt'}
     else:
         # Pack custom txt file into example datasets
         raise NotImplementedError
@@ -296,10 +294,12 @@ def main_wo_bpe():
     def filter_examples_with_length(x):
         return len(vars(x)['src']) <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN
 
-    train, val, test = torchtext.datasets.Multi30k.splits(
-            exts = ('.' + opt.lang_src, '.' + opt.lang_trg),
-            fields = (SRC, TRG),
-            filter_pred=filter_examples_with_length)
+    train, val, test = torchtext.datasets.TranslationDataset.splits(
+                                        path='data/', train='train',
+                                        validation='val',
+                                        test='test',
+                                        exts=('.pt', '.spt'),
+                                        fields=(SRC, TRG))
 
     SRC.build_vocab(train.src, min_freq=MIN_FREQ)
     print('[Info] Get source language vocabulary size:', len(SRC.vocab))
