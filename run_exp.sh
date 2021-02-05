@@ -1,10 +1,12 @@
+#!/usr/bin/env bash
+
 ! pip install spacy==2.2.2
 ! python -m spacy download pt
 ! pip install torch===1.3.1 torchvision===0.4.2 -f https://download.pytorch.org/whl/torch_stable.html
 
 ! git clone https://github.com/Tiagoblima/attention-is-all-you-need-pytorch.git
 
-%cd attention-is-all-you-need-pytorch
+cd attention-is-all-you-need-pytorch
 ! wget https://github.com/Tiagoblima/ts-corpus-mt/raw/main/simp_mt.zip
 ! unzip simp_mt.zip
 
