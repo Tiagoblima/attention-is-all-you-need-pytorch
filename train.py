@@ -230,7 +230,7 @@ def main():
     if not opt.log and not opt.save_model:
         print('No experiment result will be saved.')
         raise
-    opt.batch_size = 128
+
     if opt.batch_size < 2048 and opt.n_warmup_steps <= 4000:
         print('[Warning] The warmup steps may be not enough.\n' \
               '(sz_b, warmup) = (2048, 4000) is the official setting.\n' \
