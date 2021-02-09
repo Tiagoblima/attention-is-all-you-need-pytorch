@@ -6,8 +6,8 @@ ssh u60699@s001-n004
 
 cd  attention-is-all-you-need-pytorch || exit
 
-! python train.py -data_pkl m30k_deen_shr.pkl -log m30k_deen_shr -embs_share_weight -proj_share_weight -label_smoothing \
-         -save_model trained -b 128 -warmup 12800 -epoch 20 -no_cuda
+! python train.py -data_pkl m30k_deen_shr.pkl -log exp_hist -embs_share_weight -proj_share_weight -label_smoothing \
+         -save_model exp -b 128 -warmup 12800 -epoch 20 -no_cuda
 
 
 ! python translate.py -data_pkl m30k_deen_shr.pkl -model trained.chkpt -output prediction.txt
