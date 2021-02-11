@@ -11,4 +11,4 @@ cd  attention-is-all-you-need-pytorch || exit
          -save_model exp3 -b 32 -warmup 12800 -n_layers 10 -n_head 12 -epoch 20 -no_cuda
 
 
-! python translate.py -data_pkl m30k_deen_shr.pkl -model exp3.chkpt -output prediction_exp3.txt
+! python translate.py -data_pkl m30k_deen_shr.pkl -model exp3.chkpt -no_cuda -output prediction_exp3.txt
