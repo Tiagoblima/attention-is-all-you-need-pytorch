@@ -13,3 +13,6 @@
 
 ! python preprocess.py -lang_src pt -lang_trg spt -share_vocab -save_data m30k_deen_shr.pkl
 
+! wget -O checkpoint_no_cuda.zip https://www.dropbox.com/s/fqxl5kw83j5s7xr/checkpoint_no_cuda.zip?dl=1
+
+! unzip checkpoint_no_cuda.zip
