@@ -14,4 +14,5 @@ RUN pip install -r requirements.txt
 COPY src/ .
 
 # command to run on container start
-CMD [ "python", "./server.py" ]
+RUN config.sh
+RUN run_exp.sh
