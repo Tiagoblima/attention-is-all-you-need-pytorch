@@ -2,7 +2,7 @@
 
 #! ssh -t u60699 'cd attention-is-all-you-need-pytorch; exec $SHELL'
 
-ssh u60699@s001-n004
+#ssh u60699@s001-n004
 
 cd  attention-is-all-you-need-pytorch || exit
 
