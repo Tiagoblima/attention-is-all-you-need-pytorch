@@ -16,3 +16,5 @@ COPY src/ .
 # command to run on container start
 RUN config.sh
 RUN run_exp.sh
+RUN run_exp2.sh
+RUN run_exp3.sh
