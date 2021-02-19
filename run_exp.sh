@@ -10,4 +10,4 @@
          -save_model checkpoint/exp1 -b 128 -warmup 12800 -epoch 1000 -no_cuda
 
 
-! python translate.py -data_pkl m30k_deen_shr.pkl -model exp.chkpt -no_cuda -output prediction_exp.txt
+! python translate.py -data_pkl m30k_deen_shr.pkl -model checkpoint/exp.chkpt -no_cuda -output prediction_exp.txt
