@@ -18,3 +18,5 @@
 ! wget -O checkpoint_no_cuda.zip https://www.dropbox.com/s/fqxl5kw83j5s7xr/checkpoint_no_cuda.zip?dl=1
 
 ! unzip checkpoint_no_cuda.zip
+
+exit 0
