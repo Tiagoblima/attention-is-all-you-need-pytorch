@@ -1,6 +1,8 @@
-! git clone https://github.com/Tiagoblima/attention-is-all-you-need-pytorch.git
+#!/usr/bin/env bash
 
-! ssh -t u60699 'cd attention-is-all-you-need-pytorch; exec $SHELL'
+#! git clone https://github.com/Tiagoblima/attention-is-all-you-need-pytorch.git
+
+#! ssh -t u60699 'cd attention-is-all-you-need-pytorch; exec $SHELL'
 
 ! pwd
 
