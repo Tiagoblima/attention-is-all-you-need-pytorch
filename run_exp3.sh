@@ -7,7 +7,7 @@ ssh u60699@s001-n004
 cd  attention-is-all-you-need-pytorch || exit
 
 
-! python train.py -data_pkl m30k_deen_shr.pkl -log exp3_hist -embs_share_weight -proj_share_weight -label_smoothing \
+! python train.py -data_pkl m30k_deen_shr.pkl -log logs/exp3_hist -embs_share_weight -proj_share_weight -label_smoothing \
          -save_model checkpoint/exp3 -b 32 -warmup 12800 -n_layers 10 -n_head 12 -epoch 20 -no_cuda
 
 
