@@ -139,9 +139,9 @@ def train(model, training_data, validation_data, optimizer, device, opt):
         print('[Info] Training performance will be written to file: {} and {}'.format(
             log_train_file, log_valid_file))
 
-    # with open(log_train_file, 'w') as log_tf, open(log_valid_file, 'w') as log_vf:
-    #   log_tf.write('epoch,loss,ppl,accuracy\n')
-    #   log_vf.write('epoch,loss,ppl,accuracy\n')
+        with open(log_train_file, 'w') as log_tf, open(log_valid_file, 'w') as log_vf:
+            log_tf.write('epoch,loss,ppl,accuracy\n')
+            log_vf.write('epoch,loss,ppl,accuracy\n')
 
     def print_performances(header, loss, accu, start_time):
         print('  - {header:12} ppl: {ppl: 8.5f}, accuracy: {accu:3.3f} %, ' \
