@@ -3,3 +3,4 @@ torchtext~=0.6.0
 numpy~=1.19.3
 spacy==2.2.2
 pandas
+dill
