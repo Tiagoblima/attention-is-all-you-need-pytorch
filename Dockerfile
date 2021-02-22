@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # copy the content of the local src directory to the working directory
-COPY ./ .
+COPY attention-is-all-you-need-pytorch .
 
 # command to run on container start
 RUN config.sh
