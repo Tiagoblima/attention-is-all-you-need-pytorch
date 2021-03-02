@@ -22,7 +22,7 @@ __author__ = "Yu-Hsiang Huang"
 
 
 def cal_performance(pred, gold, trg_pad_idx, smoothing=False):
-    ''' Apply label smoothing if needed '''
+    """ Apply label smoothing if needed """
 
     loss = cal_loss(pred, gold, trg_pad_idx, smoothing=smoothing)
 
@@ -36,7 +36,7 @@ def cal_performance(pred, gold, trg_pad_idx, smoothing=False):
 
 
 def cal_loss(pred, gold, trg_pad_idx, smoothing=False):
-    ''' Calculate cross entropy loss, apply label smoothing if needed. '''
+    """ Calculate cross entropy loss, apply label smoothing if needed. """
 
     gold = gold.contiguous().view(-1)
 
@@ -68,7 +68,7 @@ def patch_trg(trg, pad_idx):
 
 
 def train_epoch(model, training_data, optimizer, opt, device, smoothing):
-    ''' Epoch operation in training phase'''
+    """ Epoch operation in training phase"""
 
     model.train()
     total_loss, n_word_total, n_word_correct = 0, 0, 0
@@ -100,7 +100,7 @@ def train_epoch(model, training_data, optimizer, opt, device, smoothing):
 
 
 def eval_epoch(model, validation_data, device, opt):
-    ''' Epoch operation in evaluation phase '''
+    """ Epoch operation in evaluation phase """
 
     model.eval()
     total_loss, n_word_total, n_word_correct = 0, 0, 0
@@ -203,7 +203,7 @@ def main():
     parser.add_argument('-epoch', type=int, default=10)
     parser.add_argument('-b', '--batch_size', type=int, default=2048)
 
-    parser.add_argument('-d_model', type=int, default=512)
+    parser.add_argument('-d_model', type=int, default=768)
     parser.add_argument('-d_inner_hid', type=int, default=2048)
     parser.add_argument('-d_k', type=int, default=64)
     parser.add_argument('-d_v', type=int, default=64)
