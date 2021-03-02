@@ -12,4 +12,5 @@
 
 ! python translate.py -data_pkl m30k_deen_shr.pkl -model checkpoint/exp.chkpt -no_cuda -output prediction_exp.txt
 
+
 exit 0
