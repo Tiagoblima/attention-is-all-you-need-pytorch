@@ -4,7 +4,6 @@ import torch.nn as nn
 import numpy as np
 from transformer.Layers import EncoderLayer, DecoderLayer
 
-
 __author__ = "Yu-Hsiang Huang"
 
 
@@ -30,6 +29,7 @@ class PositionalEncoding(nn.Module):
 
     def _get_sinusoid_encoding_table(self, n_position, d_hid):
         ''' Sinusoid position encoding table '''
+
         # TODO: make it with torch instead of numpy
 
         def get_position_angle_vec(position):
@@ -45,6 +45,19 @@ class PositionalEncoding(nn.Module):
         return x + self.pos_table[:, :x.size(1)].clone().detach()
 
 
+def create_emb_layer(weights_matrix, non_trainable=False, pad_idx=0):
+    num_embeddings, embedding_dim = weights_matrix.shape
+    emb_layer = nn.Embedding(num_embeddings, embedding_dim, padding_idx=pad_idx)
+    emb_layer.load_state_dict({'weight': weights_matrix})
+    if non_trainable:
+        emb_layer.weight.requires_grad = False
+
+    return emb_layer, num_embeddings, embedding_dim
+
+
+weights_matrix = np.load('weights.txt.npy', allow_pickle=True)
+
+
 class Encoder(nn.Module):
     ''' A encoder model with self attention mechanism. '''
 
@@ -54,7 +67,8 @@ class Encoder(nn.Module):
 
         super().__init__()
 
-        self.src_word_emb = nn.Embedding(n_src_vocab, d_word_vec, padding_idx=pad_idx)
+        self.src_word_emb, n_src_vocab, d_word_vec = create_emb_layer(weights_matrix, False, pad_idx=pad_idx)
+        # self.src_word_emb = nn.Embedding(n_src_vocab, d_word_vec, padding_idx=pad_idx)
         self.position_enc = PositionalEncoding(d_word_vec, n_position=n_position)
         self.dropout = nn.Dropout(p=dropout)
         self.layer_stack = nn.ModuleList([
@@ -67,7 +81,7 @@ class Encoder(nn.Module):
         enc_slf_attn_list = []
 
         # -- Forward
-        
+
         enc_output = self.dropout(self.position_enc(self.src_word_emb(src_seq)))
         enc_output = self.layer_norm(enc_output)
 
@@ -89,7 +103,8 @@ class Decoder(nn.Module):
 
         super().__init__()
 
-        self.trg_word_emb = nn.Embedding(n_trg_vocab, d_word_vec, padding_idx=pad_idx)
+        self.trg_word_emb, n_trg_vocab, d_word_vec = create_emb_layer(weights_matrix, False, pad_idx=pad_idx)
+        # nn.Embedding(n_trg_vocab, d_word_vec, padding_idx=pad_idx)
         self.position_enc = PositionalEncoding(d_word_vec, n_position=n_position)
         self.dropout = nn.Dropout(p=dropout)
         self.layer_stack = nn.ModuleList([
@@ -145,10 +160,10 @@ class Transformer(nn.Module):
 
         for p in self.parameters():
             if p.dim() > 1:
-                nn.init.xavier_uniform_(p) 
+                nn.init.xavier_uniform_(p)
 
         assert d_model == d_word_vec, \
-        'To facilitate the residual connections, \
+            'To facilitate the residual connections, \
          the dimensions of all module outputs shall be the same.'
 
         self.x_logit_scale = 1.
@@ -159,7 +174,6 @@ class Transformer(nn.Module):
 
         if emb_src_trg_weight_sharing:
             self.encoder.src_word_emb.weight = self.decoder.trg_word_emb.weight
-
 
     def forward(self, src_seq, trg_seq):
 
