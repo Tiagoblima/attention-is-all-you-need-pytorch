@@ -45,17 +45,17 @@ class PositionalEncoding(nn.Module):
         return x + self.pos_table[:, :x.size(1)].clone().detach()
 
 
-def create_emb_layer(weights_matrix, non_trainable=False, pad_idx=0):
-    num_embeddings, embedding_dim = weights_matrix.shape
-    emb_layer = nn.Embedding.from_pretrained(torch.FloatTensor(weights_matrix),
+def create_emb_layer(weights, pad_idx=0, trainable=False):
+    num_embeddings, embedding_dim = weights.shape
+    emb_layer = nn.Embedding.from_pretrained(torch.FloatTensor(weights),
                                              padding_idx=pad_idx)
-    if non_trainable:
-        emb_layer.weight.requires_grad = False
+
+    emb_layer.weight.requires_grad = trainable
 
     return emb_layer, num_embeddings, embedding_dim
 
 
-weights_matrix = np.load('weights.txt.npy', allow_pickle=True)
+weights_matrix = np.load('../weights.txt.npy', allow_pickle=True)
 
 
 class Encoder(nn.Module):
