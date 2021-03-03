@@ -264,12 +264,6 @@ def main_wo_bpe():
     src_lang_model = spacy.load('pt_core_news_sm')
     trg_lang_model = spacy.load('pt_core_news_sm')
 
-    def tokenize_src(text):
-        return [tok.text for tok in src_lang_model.tokenizer(text)]
-
-    def tokenize_trg(text):
-        return [tok.text for tok in trg_lang_model.tokenizer(text)]
-
     SRC = torchtext.data.Field(
         tokenize=str.split, lower=not opt.keep_case,
         pad_token=Constants.PAD_WORD, init_token=Constants.BOS_WORD, eos_token=Constants.EOS_WORD)

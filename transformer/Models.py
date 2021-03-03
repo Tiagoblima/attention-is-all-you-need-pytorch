@@ -47,8 +47,8 @@ class PositionalEncoding(nn.Module):
 
 def create_emb_layer(weights_matrix, non_trainable=False, pad_idx=0):
     num_embeddings, embedding_dim = weights_matrix.shape
-    emb_layer = nn.Embedding(num_embeddings, embedding_dim, padding_idx=pad_idx)
-    emb_layer.load_state_dict({'weight': weights_matrix})
+    emb_layer = nn.Embedding.from_pretrained(torch.FloatTensor(weights_matrix),
+                                             padding_idx=pad_idx)
     if non_trainable:
         emb_layer.weight.requires_grad = False
 
