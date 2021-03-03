@@ -271,11 +271,11 @@ def main_wo_bpe():
         return [tok.text for tok in trg_lang_model.tokenizer(text)]
 
     SRC = torchtext.data.Field(
-        tokenize=tokenize_src, lower=not opt.keep_case,
+        tokenize=str.split, lower=not opt.keep_case,
         pad_token=Constants.PAD_WORD, init_token=Constants.BOS_WORD, eos_token=Constants.EOS_WORD)
 
     TRG = torchtext.data.Field(
-        tokenize=tokenize_trg, lower=not opt.keep_case,
+        tokenize=str.split, lower=not opt.keep_case,
         pad_token=Constants.PAD_WORD, init_token=Constants.BOS_WORD, eos_token=Constants.EOS_WORD)
 
     MAX_LEN = opt.max_len
