@@ -13,9 +13,9 @@
 ! wget https://github.com/Tiagoblima/ts-corpus-mt/raw/main/simp_mt.zip
 ! unzip simp_mt.zip
 
-! python preprocess.py -lang_src pt -lang_trg spt -share_vocab -save_data m30k_deen_shr.pkl
-
 ! wget -O weights.txt.npy https://www.dropbox.com/s/xjflhkl0bs4jut8/weights.txt.npy?dl=1
+
+! python preprocess.py -lang_src pt -lang_trg spt -share_vocab -save_data m30k_deen_shr.pkl
 
 ! wget -O checkpoint_no_cuda.zip https://www.dropbox.com/s/fqxl5kw83j5s7xr/checkpoint_no_cuda.zip?dl=1
 
