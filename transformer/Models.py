@@ -55,7 +55,7 @@ def create_emb_layer(weights, pad_idx=0, trainable=False):
     return emb_layer, num_embeddings, embedding_dim
 
 
-weights_matrix = np.load('../weights.txt.npy', allow_pickle=True)
+weights_matrix = np.load('weights.txt.npy', allow_pickle=True)
 
 
 class Encoder(nn.Module):
