@@ -243,8 +243,8 @@ def main_wo_bpe():
     spacy_support_langs = ['spt', 'pt']
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-lang_src', required=True, choices=spacy_support_langs)
-    parser.add_argument('-lang_trg', required=True, choices=spacy_support_langs)
+    # parser.add_argument('-lang_src', required=True, choices=spacy_support_langs)
+    # parser.add_argument('-lang_trg', required=True, choices=spacy_support_langs)
     parser.add_argument('-save_data', required=True)
     parser.add_argument('-data_src', type=str, default=None)
     parser.add_argument('-data_trg', type=str, default=None)
