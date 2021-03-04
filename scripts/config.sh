@@ -4,6 +4,10 @@
 
 #! ssh -t u60699 'cd attention-is-all-you-need-pytorch; exec $SHELL'
 
+ssh u63074@login-2
+
+cd  attention-is-all-you-need-pytorch || exit
+
 ! pwd
 
 ! pip install spacy==2.2.2
