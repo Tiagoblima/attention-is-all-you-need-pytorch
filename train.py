@@ -187,6 +187,34 @@ def train(model, training_data, validation_data, optimizer, device, opt):
                     ppl=math.exp(min(valid_loss, 100)), accu=100 * valid_accu))
 
 
+def load_model(opt, device):
+
+    checkpoint = torch.load(opt.model, map_location=device)
+    model_opt = checkpoint['settings']
+
+    model = Transformer(
+        model_opt.src_vocab_size,
+        model_opt.trg_vocab_size,
+
+        model_opt.src_pad_idx,
+        model_opt.trg_pad_idx,
+
+        trg_emb_prj_weight_sharing=model_opt.proj_share_weight,
+        emb_src_trg_weight_sharing=model_opt.embs_share_weight,
+        d_k=model_opt.d_k,
+        d_v=model_opt.d_v,
+        d_model=model_opt.d_model,
+        d_word_vec=model_opt.d_word_vec,
+        d_inner=model_opt.d_inner_hid,
+        n_layers=model_opt.n_layers,
+        n_head=model_opt.n_head,
+        dropout=model_opt.dropout).to(device)
+
+    model.load_state_dict(checkpoint['model'])
+    print('[Info] Trained model state loaded.')
+    return model
+
+
 def main():
     """
     Usage:
@@ -194,7 +222,8 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-
+    parser.add_argument('-model', required=True,
+                        help='Path to model weight file')
     parser.add_argument('-data_pkl', default=None)  # all-in-1 data pickle or bpe field
 
     parser.add_argument('-train_path', default=None)  # bpe encoded data
@@ -250,21 +279,26 @@ def main():
 
     print(opt)
 
-    transformer = Transformer(
-        opt.src_vocab_size,
-        opt.trg_vocab_size,
-        src_pad_idx=opt.src_pad_idx,
-        trg_pad_idx=opt.trg_pad_idx,
-        trg_emb_prj_weight_sharing=opt.proj_share_weight,
-        emb_src_trg_weight_sharing=opt.embs_share_weight,
-        d_k=opt.d_k,
-        d_v=opt.d_v,
-        d_model=opt.d_model,
-        d_word_vec=opt.d_word_vec,
-        d_inner=opt.d_inner_hid,
-        n_layers=opt.n_layers,
-        n_head=opt.n_head,
-        dropout=opt.dropout).to(device)
+    if opt.model:
+
+        transformer = load_model(opt, device)
+
+    else:
+        transformer = Transformer(
+            opt.src_vocab_size,
+            opt.trg_vocab_size,
+            src_pad_idx=opt.src_pad_idx,
+            trg_pad_idx=opt.trg_pad_idx,
+            trg_emb_prj_weight_sharing=opt.proj_share_weight,
+            emb_src_trg_weight_sharing=opt.embs_share_weight,
+            d_k=opt.d_k,
+            d_v=opt.d_v,
+            d_model=opt.d_model,
+            d_word_vec=opt.d_word_vec,
+            d_inner=opt.d_inner_hid,
+            n_layers=opt.n_layers,
+            n_head=opt.n_head,
+            dropout=opt.dropout).to(device)
 
     optimizer = ScheduledOptim(
         optim.Adam(transformer.parameters(), betas=(0.9, 0.98), eps=1e-09),

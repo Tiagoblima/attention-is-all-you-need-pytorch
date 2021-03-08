@@ -45,7 +45,7 @@ class PositionalEncoding(nn.Module):
         return x + self.pos_table[:, :x.size(1)].clone().detach()
 
 
-def create_emb_layer(weights, pad_idx=0, trainable=False):
+def create_emb_layer(weights, pad_idx=0, trainable=True):
     num_embeddings, embedding_dim = weights.shape
     emb_layer = nn.Embedding.from_pretrained(torch.FloatTensor(weights),
                                              padding_idx=pad_idx)

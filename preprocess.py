@@ -265,12 +265,18 @@ def main_wo_bpe():
     trg_lang_model = spacy.load('pt_core_news_sm')
 
     SRC = torchtext.data.Field(
-        tokenize=str.split, lower=not opt.keep_case,
-        pad_token=Constants.PAD_WORD, init_token=Constants.BOS_WORD, eos_token=Constants.EOS_WORD)
+        tokenize=str.split,
+        lower=not opt.keep_case,
+        pad_token=Constants.PAD_WORD,
+        init_token=Constants.BOS_WORD,
+        eos_token=Constants.EOS_WORD)
 
     TRG = torchtext.data.Field(
-        tokenize=str.split, lower=not opt.keep_case,
-        pad_token=Constants.PAD_WORD, init_token=Constants.BOS_WORD, eos_token=Constants.EOS_WORD)
+        tokenize=str.split,
+        lower=not opt.keep_case,
+        pad_token=Constants.PAD_WORD,
+        init_token=Constants.BOS_WORD,
+        eos_token=Constants.EOS_WORD)
 
     MAX_LEN = opt.max_len
     MIN_FREQ = opt.min_word_count
@@ -285,7 +291,8 @@ def main_wo_bpe():
         return len(vars(x)['src']) <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN
 
     train, val, test = torchtext.datasets.TranslationDataset.splits(
-        path='data/', train='train',
+        path='data/',
+        train='train',
         validation='val',
         test='test',
         exts=('.pt', '.spt'),
