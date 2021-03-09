@@ -249,7 +249,7 @@ def main():
     parser.add_argument('-save_model', default=None)
     parser.add_argument('-save_mode', type=str, choices=['all', 'best'], default='best')
 
-    parser.add_argument('-no_cuda', default=torch.cuda.is_available())
+    parser.add_argument('-no_cuda', default=not torch.cuda.is_available())
     parser.add_argument('-label_smoothing', action='store_true')
 
     opt = parser.parse_args()
