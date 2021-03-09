@@ -157,7 +157,7 @@ def main():
     unk_idx = SRC.vocab.stoi[SRC.unk_token]
 
     pred_trgs, trgs, b_score = calculate_bleu_alt(test_loader, SRC, TRG, translator, device, max_len=50)
-    print(f"Bleu score: {b_score}")
+    print(f'BLEU score = {b_score*100:.2f}')
     with open(opt.output, 'w') as f:
         for pred_seq in tqdm(pred_trgs, mininterval=2, desc='  - (Test)', leave=False):
             f.write(' '.join(pred_seq).strip() + '\n')
@@ -169,7 +169,7 @@ def main():
             # print(pred_line)
 
     f.write('-' * 40)
-    f.write(f"Total Bleu Score: {b_score}")
+    f.write(f"Total Bleu Score: {b_score*100:.2f}")
     print('[Info] Finished.')
 
 
