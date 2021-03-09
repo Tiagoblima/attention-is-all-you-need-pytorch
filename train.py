@@ -222,7 +222,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-model', required=True,
+    parser.add_argument('-model', required=False,
                         help='Path to model weight file')
     parser.add_argument('-data_pkl', default=None)  # all-in-1 data pickle or bpe field
 
