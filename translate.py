@@ -4,7 +4,7 @@ import torch
 import argparse
 import dill as pickle
 from tqdm import tqdm
-
+from torchtext.data.metrics import bleu_score
 import transformer.Constants as Constants
 from torchtext.data import Dataset
 from transformer.Models import Transformer
@@ -12,7 +12,6 @@ from transformer.Translator import Translator
 
 
 def load_model(opt, device):
-
     checkpoint = torch.load(opt.model, map_location=device)
     model_opt = checkpoint['settings']
 
@@ -36,11 +35,77 @@ def load_model(opt, device):
 
     model.load_state_dict(checkpoint['model'])
     print('[Info] Trained model state loaded.')
-    return model 
+    return model
+
+
+def translate_sentence_vectorized(src_tensor, src_field, trg_field, model, device, max_len=50):
+    assert isinstance(src_tensor, torch.Tensor)
+
+    model.eval()
+    src_mask = model.make_src_mask(src_tensor)
+
+    with torch.no_grad():
+        enc_src = model.encoder(src_tensor, src_mask)
+    # enc_src = [batch_sz, src_len, hid_dim]
+
+    trg_indexes = [[trg_field.vocab.stoi[trg_field.init_token]] for _ in range(len(src_tensor))]
+    # Even though some examples might have been completed by producing a <eos> token
+    # we still need to feed them through the model because other are not yet finished
+    # and all examples act as a batch. Once every single sentence prediction encounters
+    # <eos> token, then we can stop predicting.
+    translations_done = [0] * len(src_tensor)
+    for i in range(max_len):
+        trg_tensor = torch.LongTensor(trg_indexes).to(device)
+        trg_mask = model.make_trg_mask(trg_tensor)
+        with torch.no_grad():
+            output, attention = model.decoder(trg_tensor, enc_src, trg_mask, src_mask)
+        pred_tokens = output.argmax(2)[:, -1]
+        for i, pred_token_i in enumerate(pred_tokens):
+            trg_indexes[i].append(pred_token_i)
+            if pred_token_i == trg_field.vocab.stoi[trg_field.eos_token]:
+                translations_done[i] = 1
+        if all(translations_done):
+            break
+
+    # Iterate through each predicted example one by one;
+    # Cut-off the portion including the after the <eos> token
+    pred_sentences = []
+    for trg_sentence in trg_indexes:
+        pred_sentence = []
+        for i in range(1, len(trg_sentence)):
+            if trg_sentence[i] == trg_field.vocab.stoi[trg_field.eos_token]:
+                break
+            pred_sentence.append(trg_field.vocab.itos[trg_sentence[i]])
+        pred_sentences.append(pred_sentence)
+
+    return pred_sentences, attention
+
+
+def calculate_bleu_alt(iterator, src_field, trg_field, model, device, max_len=50):
+    trgs = []
+    pred_trgs = []
+    with torch.no_grad():
+        for batch in iterator:
+            src = batch.src
+            trg = batch.trg
+            _trgs = []
+            for sentence in trg:
+                tmp = []
+                # Start from the first token which skips the <start> token
+                for i in sentence[1:]:
+                    # Targets are padded. So stop appending as soon as a padding or eos token is encountered
+                    if i == trg_field.vocab.stoi[trg_field.eos_token] or i == trg_field.vocab.stoi[trg_field.pad_token]:
+                        break
+                    tmp.append(trg_field.vocab.itos[i])
+                _trgs.append([tmp])
+            trgs += _trgs
+            pred_trg, _ = translate_sentence_vectorized(src, src_field, trg_field, model, device)
+            pred_trgs += pred_trg
+    return pred_trgs, trgs, bleu_score(pred_trgs, trgs)
 
 
 def main():
-    '''Main Function'''
+    """Main Function"""
 
     parser = argparse.ArgumentParser(description='translate.py')
 
@@ -56,14 +121,14 @@ def main():
     parser.add_argument('-no_cuda', action='store_true')
 
     # TODO: Translate bpe encoded files 
-    #parser.add_argument('-src', required=True,
+    # parser.add_argument('-src', required=True,
     #                    help='Source sequence to decode (one line per sequence)')
-    #parser.add_argument('-vocab', required=True,
+    # parser.add_argument('-vocab', required=True,
     #                    help='Source sequence to decode (one line per sequence)')
     # TODO: Batch translation
-    #parser.add_argument('-batch_size', type=int, default=30,
+    # parser.add_argument('-batch_size', type=int, default=30,
     #                    help='Batch size')
-    #parser.add_argument('-n_best', type=int, default=1,
+    # parser.add_argument('-n_best', type=int, default=1,
     #                    help="""If verbose is set, will output the n_best
     #                    decoded sentences""")
 
@@ -78,7 +143,7 @@ def main():
     opt.trg_eos_idx = TRG.vocab.stoi[Constants.EOS_WORD]
 
     test_loader = Dataset(examples=data['test'], fields={'src': SRC, 'trg': TRG})
-    
+
     device = torch.device('cuda' if opt.cuda else 'cpu')
     translator = Translator(
         model=load_model(opt, device),
@@ -90,17 +155,23 @@ def main():
         trg_eos_idx=opt.trg_eos_idx).to(device)
 
     unk_idx = SRC.vocab.stoi[SRC.unk_token]
-    with open(opt.output, 'w') as f:
-        for example in tqdm(test_loader, mininterval=2, desc='  - (Test)', leave=False):
-            #print(' '.join(example.src))
-            src_seq = [SRC.vocab.stoi.get(word, unk_idx) for word in example.src]
-            pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
-            pred_line = ' '.join(TRG.vocab.itos[idx] for idx in pred_seq)
-            pred_line = pred_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
-            #print(pred_line)
-            f.write(pred_line.strip() + '\n')
 
+    pred_trgs, trgs, b_score = calculate_bleu_alt(test_loader, SRC, TRG, translator, device, max_len=50)
+    print(f"Bleu score: {b_score}")
+    with open(opt.output, 'w') as f:
+        for pred_seq in tqdm(pred_trgs, mininterval=2, desc='  - (Test)', leave=False):
+            f.write(' '.join(pred_seq).strip() + '\n')
+            # print(' '.join(example.src))
+            # src_seq = [SRC.vocab.stoi.get(word, unk_idx) for word in example]
+            # pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
+            # pred_line =
+            # pred_line = pred_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
+            # print(pred_line)
+
+    f.write('-' * 40)
+    f.write(f"Total Bleu Score: {b_score}")
     print('[Info] Finished.')
+
 
 if __name__ == "__main__":
     '''
