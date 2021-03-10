@@ -45,9 +45,10 @@ class PositionalEncoding(nn.Module):
         return x + self.pos_table[:, :x.size(1)].clone().detach()
 
 
-def create_emb_layer(weights, pad_idx=0, trainable=True):
-    num_embeddings, embedding_dim = weights.shape
-    emb_layer = nn.Embedding.from_pretrained(torch.FloatTensor(weights),
+def create_emb_layer(pad_idx=0, trainable=True):
+    weights_matrix = np.load('weights_matrix.npy', allow_pickle=True)
+    num_embeddings, embedding_dim = weights_matrix.shape
+    emb_layer = nn.Embedding.from_pretrained(torch.FloatTensor(weights_matrix),
                                              padding_idx=pad_idx)
 
     emb_layer.weight.requires_grad = trainable
@@ -55,7 +56,7 @@ def create_emb_layer(weights, pad_idx=0, trainable=True):
     return emb_layer, num_embeddings, embedding_dim
 
 
-weights_matrix = np.load('weights.txt.npy', allow_pickle=True)
+
 
 
 class Encoder(nn.Module):
@@ -67,7 +68,7 @@ class Encoder(nn.Module):
 
         super().__init__()
 
-        self.src_word_emb, n_src_vocab, d_word_vec = create_emb_layer(weights_matrix, pad_idx=pad_idx)
+        self.src_word_emb, n_src_vocab, d_word_vec = create_emb_layer(pad_idx=pad_idx)
         # self.src_word_emb = nn.Embedding(n_src_vocab, d_word_vec, padding_idx=pad_idx)
         self.position_enc = PositionalEncoding(d_word_vec, n_position=n_position)
         self.dropout = nn.Dropout(p=dropout)
@@ -103,7 +104,7 @@ class Decoder(nn.Module):
 
         super().__init__()
 
-        self.trg_word_emb, n_trg_vocab, d_word_vec = create_emb_layer(weights_matrix, pad_idx=pad_idx)
+        self.trg_word_emb, n_trg_vocab, d_word_vec = create_emb_layer(pad_idx=pad_idx)
         # nn.Embedding(n_trg_vocab, d_word_vec, padding_idx=pad_idx)
         self.position_enc = PositionalEncoding(d_word_vec, n_position=n_position)
         self.dropout = nn.Dropout(p=dropout)
