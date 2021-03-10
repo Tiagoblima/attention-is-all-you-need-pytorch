@@ -18,12 +18,12 @@
 ! wget https://github.com/Tiagoblima/ts-corpus-mt/raw/main/simp_mt.zip
 ! unzip simp_mt.zip
 
-! wget -O weights.txt.npy https://www.dropbox.com/s/xjflhkl0bs4jut8/weights.txt.npy?dl=1
+! wget -O glove_s300.zip https://www.dropbox.com/s/s74ovzynh5jbccz/glove_s300.zip?dl=1
+! unzip glove_s300.zip
+
 
 ! python preprocess.py -share_vocab -save_data m30k_deen_shr.pkl
 
-! wget -O checkpoint_no_cuda.zip https://www.dropbox.com/s/fqxl5kw83j5s7xr/checkpoint_no_cuda.zip?dl=1
-
-! unzip checkpoint_no_cuda.zip
-
+! wget -O checkpoint.zip https://www.dropbox.com/s/8pylo68adanolew/checkpoint.zip?dl=1
+! unzip checkpoint.zip
 exit 0

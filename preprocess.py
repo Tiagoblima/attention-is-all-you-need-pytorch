@@ -16,6 +16,7 @@ from torchtext.datasets import TranslationDataset
 import transformer.Constants as Constants
 from learn_bpe import learn_bpe
 from apply_bpe import BPE
+import numpy as np
 
 __author__ = "Yu-Hsiang Huang"
 
@@ -315,6 +316,35 @@ def main_wo_bpe():
         SRC.vocab.stoi = TRG.vocab.stoi
         SRC.vocab.itos = TRG.vocab.itos
         print('[Info] Get merged vocabulary size:', len(TRG.vocab))
+
+        glove_path = 'glove_s300.txt'
+
+        word2vec = {}
+        print("[Info] Creating Embedding...")
+        with open(glove_path, 'r') as f:
+            for l in f:
+                try:
+                    line = l.split()
+                    word = line[0]
+                    vect = np.array(line[1:]).astype(np.float)
+                    word2vec[word] = vect
+                except ValueError:
+                    pass
+        matrix_len = len(SRC.vocab.itos)
+        emb_dim = 300
+        weights_matrix = np.zeros((matrix_len, emb_dim))
+        words_found = 0
+        print("[Info] Creating Embedding Matrix...")
+        for i, word in enumerate(SRC.vocab.itos):
+            try:
+                weights_matrix[i] = word2vec[word]
+                words_found += 1
+            except KeyError:
+                weights_matrix[i] = np.random.normal(scale=0.6, size=(1, emb_dim))
+            except ValueError:
+                weights_matrix[i] = np.random.normal(scale=0.6, size=(1, emb_dim))
+
+        np.save('weights_matrix', weights_matrix)
 
     data = {
         'settings': opt,
