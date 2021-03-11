@@ -9,6 +9,7 @@ import transformer.Constants as Constants
 from torchtext.data import Dataset
 from transformer.Models import Transformer
 from transformer.Translator import Translator
+import torch
 
 
 def load_model(opt, device):
@@ -133,7 +134,7 @@ def main():
     #                    decoded sentences""")
 
     opt = parser.parse_args()
-    opt.cuda = not opt.no_cuda
+
 
     data = pickle.load(open(opt.data_pkl, 'rb'))
     SRC, TRG = data['vocab']['src'], data['vocab']['trg']
@@ -144,7 +145,7 @@ def main():
 
     test_loader = Dataset(examples=data['test'], fields={'src': SRC, 'trg': TRG})
 
-    device = torch.device('cuda' if opt.cuda else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     translator = Translator(
         model=load_model(opt, device),
         beam_size=opt.beam_size,
@@ -157,7 +158,7 @@ def main():
     unk_idx = SRC.vocab.stoi[SRC.unk_token]
 
     pred_trgs, trgs, b_score = calculate_bleu_alt(test_loader, SRC, TRG, translator, device, max_len=50)
-    print(f'BLEU score = {b_score*100:.2f}')
+    print(f'BLEU score = {b_score * 100:.2f}')
     with open(opt.output, 'w') as f:
         for pred_seq in tqdm(pred_trgs, mininterval=2, desc='  - (Test)', leave=False):
             f.write(' '.join(pred_seq).strip() + '\n')
@@ -169,7 +170,7 @@ def main():
             # print(pred_line)
 
     f.write('-' * 40)
-    f.write(f"Total Bleu Score: {b_score*100:.2f}")
+    f.write(f"Total Bleu Score: {b_score * 100:.2f}")
     print('[Info] Finished.')
 
 
