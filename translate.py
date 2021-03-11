@@ -10,7 +10,7 @@ from torchtext.data import Dataset
 from transformer.Models import Transformer
 from transformer.Translator import Translator
 import torch
-
+import pandas as pd
 
 def load_model(opt, device):
     checkpoint = torch.load(opt.model, map_location=device)
@@ -159,6 +159,7 @@ def main():
 
     preds = []
     trgs = []
+    scores = []
     with open(opt.output, 'w') as f:
         for example in tqdm(test_loader, mininterval=2, desc='  - (Test)', leave=False):
             # print(' '.join(example.src))
@@ -175,8 +176,17 @@ def main():
 
             # print(pred_line)
             f.write(pred_line.strip() + '\n')
+            score = bleu_score([pred_line.split()], [trg_line.strip().split()])
+            scores.append(score)
 
-    bleu_score(pred_line, trgs)
+    b_score = bleu_score(pred_line, trgs)
+    print(f'BLEU score = {b_score * 100:.2f}')
+
+    pd.DataFrame({
+        'preds': preds,
+        'trgs': trgs,
+        'scores': scores
+    }).to_csv('predictions_scores.csv')
     print('[Info] Finished.')
 
 
