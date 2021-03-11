@@ -106,7 +106,7 @@ def calculate_bleu_alt(iterator, src_field, trg_field, model, device, max_len=50
 
 
 def main():
-    """Main Function"""
+    '''Main Function'''
 
     parser = argparse.ArgumentParser(description='translate.py')
 
@@ -121,7 +121,7 @@ def main():
     parser.add_argument('-max_seq_len', type=int, default=100)
     parser.add_argument('-no_cuda', action='store_true')
 
-    # TODO: Translate bpe encoded files 
+    # TODO: Translate bpe encoded files
     # parser.add_argument('-src', required=True,
     #                    help='Source sequence to decode (one line per sequence)')
     # parser.add_argument('-vocab', required=True,
@@ -134,7 +134,7 @@ def main():
     #                    decoded sentences""")
 
     opt = parser.parse_args()
-
+    opt.cuda = not opt.no_cuda
 
     data = pickle.load(open(opt.data_pkl, 'rb'))
     SRC, TRG = data['vocab']['src'], data['vocab']['trg']
@@ -145,7 +145,7 @@ def main():
 
     test_loader = Dataset(examples=data['test'], fields={'src': SRC, 'trg': TRG})
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda' if opt.cuda else 'cpu')
     translator = Translator(
         model=load_model(opt, device),
         beam_size=opt.beam_size,
@@ -157,20 +157,26 @@ def main():
 
     unk_idx = SRC.vocab.stoi[SRC.unk_token]
 
-    pred_trgs, trgs, b_score = calculate_bleu_alt(test_loader, SRC, TRG, translator, device, max_len=50)
-    print(f'BLEU score = {b_score * 100:.2f}')
+    preds = []
+    trgs = []
     with open(opt.output, 'w') as f:
-        for pred_seq in tqdm(pred_trgs, mininterval=2, desc='  - (Test)', leave=False):
-            f.write(' '.join(pred_seq).strip() + '\n')
+        for example in tqdm(test_loader, mininterval=2, desc='  - (Test)', leave=False):
             # print(' '.join(example.src))
-            # src_seq = [SRC.vocab.stoi.get(word, unk_idx) for word in example]
-            # pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
-            # pred_line =
-            # pred_line = pred_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
-            # print(pred_line)
+            src_seq = [SRC.vocab.stoi.get(word, unk_idx) for word in example.src]
+            pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
+            pred_line = ' '.join(TRG.vocab.itos[idx] for idx in pred_seq)
+            pred_line = pred_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
+            preds.append(pred_line.split())
 
-    f.write('-' * 40)
-    f.write(f"Total Bleu Score: {b_score * 100:.2f}")
+            trg_seq = [SRC.vocab.stoi.get(word, unk_idx) for word in example.trg]
+            trg_line = ' '.join(TRG.vocab.itos[idx] for idx in trg_seq)
+            trg_line = trg_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
+            trgs.append(trg_line.strip().split())
+
+            # print(pred_line)
+            f.write(pred_line.strip() + '\n')
+
+    bleu_score(pred_line, trgs)
     print('[Info] Finished.')
 
 
