@@ -12,6 +12,7 @@ from transformer.Translator import Translator
 import torch
 import pandas as pd
 
+
 def load_model(opt, device):
     checkpoint = torch.load(opt.model, map_location=device)
     model_opt = checkpoint['settings']
@@ -159,11 +160,17 @@ def main():
 
     preds = []
     trgs = []
+    srcs = []
     scores = []
     with open(opt.output, 'w') as f:
         for example in tqdm(test_loader, mininterval=2, desc='  - (Test)', leave=False):
             # print(' '.join(example.src))
             src_seq = [SRC.vocab.stoi.get(word, unk_idx) for word in example.src]
+
+            src_line = ' '.join(TRG.vocab.itos[idx] for idx in src_seq)
+            src_line = src_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
+            srcs.append(src_line.split())
+
             pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
             pred_line = ' '.join(TRG.vocab.itos[idx] for idx in pred_seq)
             pred_line = pred_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
@@ -179,13 +186,15 @@ def main():
             score = bleu_score([pred_line.split()], [trg_line.strip().split()])
             scores.append(score)
 
-    b_score = bleu_score(pred_line, trgs)
+    b_score = bleu_score(preds, trgs)
     print(f'BLEU score = {b_score * 100:.2f}')
 
     pd.DataFrame({
-        'preds': preds,
-        'trgs': trgs,
-        'scores': scores
+        'src_sent': srcs,
+        'pred_sent': preds,
+        'trg_sent': trgs,
+        'metric': ['bleu_score'] * len(preds),
+        'score': scores
     }).to_csv('predictions_scores.csv')
     print('[Info] Finished.')
 
