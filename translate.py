@@ -169,7 +169,7 @@ def main():
 
             src_line = ' '.join(TRG.vocab.itos[idx] for idx in src_seq)
             src_line = src_line.replace(Constants.BOS_WORD, '').replace(Constants.EOS_WORD, '')
-            srcs.append(src_line.split())
+            srcs.append(src_line)
 
             pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
             pred_line = ' '.join(TRG.vocab.itos[idx] for idx in pred_seq)
@@ -191,8 +191,8 @@ def main():
 
     pd.DataFrame({
         'src_sent': srcs,
-        'pred_sent': preds,
-        'trg_sent': trgs,
+        'pred_sent': list(map(' '.join, preds)),
+        'trg_sent': list(map(' '.join, trgs)),
         'metric': ['bleu_score'] * len(preds),
         'score': scores
     }).to_csv('predictions_scores.csv')
