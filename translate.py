@@ -188,14 +188,14 @@ def main():
 
     b_score = bleu_score(preds, trgs)
     print(f'BLEU score = {b_score * 100:.2f}')
-
+    report_name = opt.output.split('.')[0] + '_scores.csv'
     pd.DataFrame({
         'src_sent': srcs,
         'pred_sent': list(map(' '.join, preds)),
         'trg_sent': list(map(' '.join, trgs)),
         'metric': ['bleu_score'] * len(preds),
         'score': scores
-    }).to_csv('predictions_scores.csv')
+    }).to_csv(report_name)
     print('[Info] Finished.')
 
 
