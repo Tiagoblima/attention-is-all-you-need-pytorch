@@ -2,11 +2,11 @@
 
 #! git clone https://github.com/Tiagoblima/attention-is-all-you-need-pytorch.git
 
-#! ssh -t u60699 'cd attention-is-all-you-need-pytorch; exec $SHELL'
+! ssh -t u60699 'cd attention-is-all-you-need-pytorch; exec $SHELL'
 
-#ssh u63074@login-2
+! ssh u63074@login-2
 
-#cd  attention-is-all-you-need-pytorch || exit
+cd  attention-is-all-you-need-pytorch || exit
 
 ! pwd
 
