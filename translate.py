@@ -183,7 +183,7 @@ def main():
 
             # print(pred_line)
             f.write(pred_line.strip() + '\n')
-            score = bleu_score([pred_line.split()], [trg_line.strip().split()])
+            score = bleu_score([pred_line.split()], [[trg_line.strip().split()]])
             scores.append(score)
 
     b_score = bleu_score(preds, trgs)
