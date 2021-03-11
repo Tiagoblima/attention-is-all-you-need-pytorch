@@ -145,7 +145,7 @@ def main():
 
     test_loader = Dataset(examples=data['test'], fields={'src': SRC, 'trg': TRG})
 
-    device = torch.device('cuda' if opt.cuda else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     translator = Translator(
         model=load_model(opt, device),
         beam_size=opt.beam_size,
