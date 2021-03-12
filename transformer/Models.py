@@ -56,9 +56,6 @@ def create_emb_layer(pad_idx=0, trainable=True):
     return emb_layer, num_embeddings, embedding_dim
 
 
-
-
-
 class Encoder(nn.Module):
     ''' A encoder model with self attention mechanism. '''
 
@@ -68,8 +65,8 @@ class Encoder(nn.Module):
 
         super().__init__()
 
-        self.src_word_emb, n_src_vocab, d_word_vec = create_emb_layer(pad_idx=pad_idx)
-        # self.src_word_emb = nn.Embedding(n_src_vocab, d_word_vec, padding_idx=pad_idx)
+        # self.src_word_emb, n_src_vocab, d_word_vec = create_emb_layer(pad_idx=pad_idx)
+        self.src_word_emb = nn.Embedding(n_src_vocab, d_word_vec, padding_idx=pad_idx)
         self.position_enc = PositionalEncoding(d_word_vec, n_position=n_position)
         self.dropout = nn.Dropout(p=dropout)
         self.layer_stack = nn.ModuleList([
@@ -104,8 +101,8 @@ class Decoder(nn.Module):
 
         super().__init__()
 
-        self.trg_word_emb, n_trg_vocab, d_word_vec = create_emb_layer(pad_idx=pad_idx)
-        # nn.Embedding(n_trg_vocab, d_word_vec, padding_idx=pad_idx)
+        # self.trg_word_emb, n_trg_vocab, d_word_vec = create_emb_layer(pad_idx=pad_idx)
+        self.trg_word_emb = nn.Embedding(n_trg_vocab, d_word_vec, padding_idx=pad_idx)
         self.position_enc = PositionalEncoding(d_word_vec, n_position=n_position)
         self.dropout = nn.Dropout(p=dropout)
         self.layer_stack = nn.ModuleList([

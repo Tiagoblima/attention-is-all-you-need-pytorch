@@ -187,7 +187,9 @@ def main():
             scores.append(score)
 
     references = list(map(lambda l: [l], trgs))
-    b_score = bleu_score(preds, [references])
+    print(references[:1])
+    print(preds[:1])
+    b_score = bleu_score(preds, references)
     print(f'BLEU score = {b_score * 100:.2f}')
     report_name = opt.output.split('.')[0] + '_scores.csv'
     pd.DataFrame({
