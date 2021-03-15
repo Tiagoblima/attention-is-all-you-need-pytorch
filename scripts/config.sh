@@ -24,6 +24,5 @@ cd  attention-is-all-you-need-pytorch || exit
 
 ! python preprocess.py -share_vocab -save_data m30k_deen_shr.pkl
 
-! wget -O checkpoint.zip https://www.dropbox.com/s/8pylo68adanolew/checkpoint.zip?dl=1
-! unzip checkpoint.zip
+! mkdir "checkpoint"
 exit 0
