@@ -15,8 +15,7 @@ cd  attention-is-all-you-need-pytorch || exit
 ! python -m spacy download pt
 #! pip install torch===1.3.1 torchvision===0.4.2 -f https://download.pytorch.org/whl/torch_stable.html
 
-! wget https://github.com/Tiagoblima/ts-corpus-mt/raw/main/simp_mt.zip
-! unzip simp_mt.zip
+! git clone https://github.com/Tiagoblima/ts-corpus-mt.git
 
 ! wget -O glove_s300.zip https://www.dropbox.com/s/s74ovzynh5jbccz/glove_s300.zip?dl=1
 ! unzip glove_s300.zip

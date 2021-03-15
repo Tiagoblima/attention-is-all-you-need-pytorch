@@ -265,15 +265,23 @@ def main_wo_bpe():
     src_lang_model = spacy.load('pt_core_news_sm')
     trg_lang_model = spacy.load('pt_core_news_sm')
 
+    nlp = spacy.load("pt_core_news_sm")
+
+    def tokenize_pt(text):
+        """
+        Tokenizes Portuguese text from a string into a list of strings
+        """
+        return [tok.text for tok in nlp.tokenizer(text)]
+
     SRC = torchtext.data.Field(
-        tokenize=str.split,
+        tokenize=tokenize_pt,
         lower=not opt.keep_case,
         pad_token=Constants.PAD_WORD,
         init_token=Constants.BOS_WORD,
         eos_token=Constants.EOS_WORD)
 
     TRG = torchtext.data.Field(
-        tokenize=str.split,
+        tokenize=tokenize_pt,
         lower=not opt.keep_case,
         pad_token=Constants.PAD_WORD,
         init_token=Constants.BOS_WORD,
@@ -292,7 +300,7 @@ def main_wo_bpe():
         return len(vars(x)['src']) <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN
 
     train, val, test = torchtext.datasets.TranslationDataset.splits(
-        path='data/',
+        path='ts-corpus-mt/',
         train='train',
         validation='val',
         test='test',
