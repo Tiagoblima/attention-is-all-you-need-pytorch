@@ -222,7 +222,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-model', required=False,
+    parser.add_argument('-pretrained', required=False,
                         help='Path to model weight file')
     parser.add_argument('-data_pkl', default=None)  # all-in-1 data pickle or bpe field
 
@@ -279,7 +279,7 @@ def main():
 
     print(opt)
 
-    if opt.model:
+    if opt.pretrained:
 
         transformer = load_model(opt, device)
 
